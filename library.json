@@ -1,0 +1,33 @@
+{
+  "name": "zPref",
+  "version": "1.0.0",
+  "description": "Type-safe NVS-backed preferences library for ESP32 with automatic persistence",
+  "keywords": ["preferences", "nvs", "esp32", "configuration", "settings", "embedded", "storage"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zmeiresearch/zPref.git"
+  },
+  "authors": [
+    {
+      "name": "Ivan Vasilev",
+      "email": "ivan@zmeiresearch.com",
+      "maintainer": true
+    }
+  ],
+  "license": "MIT",
+  "frameworks": ["arduino", "espidf"],
+  "platforms": ["espressif32"],
+  "dependencies": {
+    "zmeiresearch/zGlobals": "https://github.com/zmeiresearch/zGlobals.git",
+    "zmeiresearch/zLogger": "https://github.com/zmeiresearch/zLogger.git"
+  },
+  "export": {
+    "include": [
+      "src/*",
+      "examples/*",
+      "LICENSE",
+      "README.md",
+      "library.json"
+    ]
+  }
+}
