@@ -1,6 +1,6 @@
 {
   "name": "zPref",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Type-safe NVS-backed preferences library for ESP32 with automatic persistence",
   "keywords": ["preferences", "nvs", "esp32", "configuration", "settings", "embedded", "storage"],
   "repository": {

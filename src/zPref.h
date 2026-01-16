@@ -51,16 +51,15 @@
  *
  * Example:
  * @code
- * class MyConfig : public zPref<MyConfig> {
+ * class MyConfig : public zPref {
  *     public:
  *         DECLARE_CONFIG_VARIABLE(String, DeviceName);
  *         DECLARE_CONFIG_VARIABLE(Bool, EnableWifi);
  *
- *         MyConfig() : zPref<MyConfig>("MyApp", 1) {}
+ *         MyConfig() : zPref("MyApp", 1) {}
  * };
  * @endcode
  */
-template<typename TDerived>
 class zPref : public zPrefBase
 {
     private:
@@ -90,58 +89,7 @@ class zPref : public zPrefBase
          * @param partition_name NVS partition name (defaults to NVS_DEFAULT_PART_NAME)
          * @return eStatus - eOK on success, eFAILED on error
          */
-        eStatus Init(const char* partition_name = NVS_DEFAULT_PART_NAME) {
-            eStatus retVal = eOK;
-            status = eINPROGRESS;
-            _partition_name = partition_name;
-            LOG(eLogInfo, "Initializing NVS partition: %s, namespace: %s", _partition_name, _namespace);
-
-            // Initialize NVS flash partition
-            esp_err_t err = nvs_flash_init_partition(_partition_name);
-            if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-                LOG(eLogWarn, "NVS partition needs erasing, erasing partition %s", _partition_name);
-                ESP_ERROR_CHECK(nvs_flash_erase_partition(_partition_name));
-                err = nvs_flash_init_partition(_partition_name);
-            }
-
-            if (err != ESP_OK) {
-                LOG(eLogWarn, "Error initializing NVS flash partition %s: %s", _partition_name, esp_err_to_name(err));
-                retVal = eFAILED;
-            } else {
-                // Open NVS handle with the specified partition
-                err = nvs_open_from_partition(_partition_name, _namespace, NVS_READWRITE, &_nvs_handle);
-                if (err != ESP_OK) {
-                    LOG(eLogWarn, "Error opening NVS namespace %s in partition %s: %s",
-                        _namespace, _partition_name, esp_err_to_name(err));
-                    retVal = eFAILED;
-                } else {
-                    // Read stored configuration version
-                    uint32_t storedVersion = nvs_getULong(CONFIG_VERSION_KEY, 0);
-
-                    // Check if migration is needed
-                    if (storedVersion != _currentVersion) {
-                        LOG(eLogInfo, "Configuration version mismatch: stored=%d, current=%d",
-                            storedVersion, _currentVersion);
-
-                        // Call user's initialization/migration hook
-                        retVal = static_cast<TDerived*>(this)->OnInit(storedVersion, _currentVersion);
-
-                        // If migration was successful, update the stored version
-                        if (retVal == eOK) {
-                            nvs_putULong(CONFIG_VERSION_KEY, _currentVersion);
-                            commit();
-                            LOG(eLogInfo, "Configuration version updated to %d", _currentVersion);
-                        }
-                    } else {
-                        // Versions match, just call OnInit with matching versions
-                        retVal = static_cast<TDerived*>(this)->OnInit(storedVersion, _currentVersion);
-                    }
-                }
-            }
-
-            status = (retVal == eOK) ? eOK : eFAILED;
-            return retVal;
-        }
+        eStatus Init(const char* partition_name = NVS_DEFAULT_PART_NAME);
 
         /**
          * @brief Reset all configuration variables to defaults
@@ -149,10 +97,7 @@ class zPref : public zPrefBase
          *
          * Users should override this method to reset their specific variables
          */
-        virtual eStatus Reset() {
-            LOG(eLogInfo, "Reset called - override this method to reset your variables");
-            return eOK;
-        }
+        virtual eStatus Reset();
 
         /**
          * @brief Hook called after NVS is initialized
@@ -181,22 +126,12 @@ class zPref : public zPrefBase
          * }
          * @endcode
          */
-        virtual eStatus OnInit(uint32_t storedVersion, uint32_t currentVersion) {
-            (void)storedVersion;
-            (void)currentVersion;
-            return eOK;
-        }
+        virtual eStatus OnInit(uint32_t storedVersion, uint32_t currentVersion);
 
         /**
          * @brief Close the NVS handle
          */
-        void End() {
-            LOG(eLogInfo, "Closing NVS handle");
-            if (_nvs_handle != 0) {
-                nvs_close(_nvs_handle);
-                _nvs_handle = 0;
-            }
-        }
+        void End();
 
         /**
          * @brief Get the current status

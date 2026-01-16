@@ -22,7 +22,7 @@
 //==============================================================================
 // Define your configuration class
 //==============================================================================
-class MyConfig : public zPref<MyConfig>
+class MyConfig : public zPref
 {
     private:
         static const uint32_t CONFIG_VERSION = 1;
@@ -37,7 +37,7 @@ class MyConfig : public zPref<MyConfig>
         DECLARE_CONFIG_VARIABLE(Long64,  UpdateInterval);
 
     public:
-        MyConfig() : zPref<MyConfig>("MyApp", CONFIG_VERSION) {}
+        MyConfig() : zPref("MyApp", CONFIG_VERSION) {}
 
         // Override Reset to set all variables to defaults
         eStatus Reset() override {

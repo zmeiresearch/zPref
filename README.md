@@ -55,7 +55,7 @@ lib_deps =
 ```cpp
 #include <zPref.h>
 
-class MyConfig : public zPref<MyConfig>
+class MyConfig : public zPref
 {
     private:
         static const uint32_t CONFIG_VERSION = 1;
@@ -68,7 +68,7 @@ class MyConfig : public zPref<MyConfig>
         DECLARE_CONFIG_VARIABLE(UShort, ServerPort);
 
     public:
-        MyConfig() : zPref<MyConfig>("MyApp", CONFIG_VERSION) {}
+        MyConfig() : zPref("MyApp", CONFIG_VERSION) {}
 
         // Override Reset to restore defaults
         eStatus Reset() override {
@@ -178,7 +178,7 @@ The library will:
 - Automatically update the stored version after successful migration
 
 ```cpp
-class MyConfig : public zPref<MyConfig>
+class MyConfig : public zPref
 {
     private:
         static const uint32_t CONFIG_VERSION = 2;
@@ -187,7 +187,7 @@ class MyConfig : public zPref<MyConfig>
         DECLARE_CONFIG_VARIABLE(String, DeviceName);
         DECLARE_CONFIG_VARIABLE(String, NewVariable);
 
-        MyConfig() : zPref<MyConfig>("MyApp", CONFIG_VERSION) {}
+        MyConfig() : zPref("MyApp", CONFIG_VERSION) {}
 
         eStatus OnInit(uint32_t storedVersion, uint32_t currentVersion) override {
             if (storedVersion < currentVersion) {
@@ -221,7 +221,7 @@ You can specify a custom NVS namespace (max 15 characters):
 
 ```cpp
 // In constructor (with custom namespace and version)
-MyConfig() : zPref<MyConfig>("MyNamespace", 1) {}
+MyConfig() : zPref("MyNamespace", 1) {}
 ```
 
 ### Custom Partition
@@ -238,16 +238,16 @@ void setup() {
 
 ### Configuration Class
 
-Create your configuration class by inheriting from `zPref<YourClass>`:
+Create your configuration class by inheriting from `zPref`:
 
 ```cpp
-class MyConfig : public zPref<MyConfig> {
+class MyConfig : public zPref {
     public:
         // Your configuration variables
         DECLARE_CONFIG_VARIABLE(String, VariableName);
 
         // Constructor with namespace and version
-        MyConfig() : zPref<MyConfig>("namespace", 1) {}
+        MyConfig() : zPref("namespace", 1) {}
 
         // Optional overrides
         eStatus Reset() override;
